@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 3.10)
 
 project(Stock-market-simulation LANGUAGES CXX)
 
-set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-warnings-as-errors=*")
+set(CMAKE_CXX_CLANG_TIDY "clang-tidy;
+-warnings-as-errors=*")
 set(CMAKE_CXX_STANDARD 23)
 set(CMAKE_CXX_STANDARD_REQUIRED_ON)
 
@@ -10,7 +11,15 @@ set(SOURCES
     main.cpp
     Order.h
     OrderBook.h
-    OrderBook.cpp)
+    OrderBook.cpp
+    Agent.h
+    AggressiveAgent.h
+    AggressiveAgent.cpp
+    Action.h
+    ConservativeAgent.h
+    ConservativeAgent.cpp
+    Logger.h
+)
 
 add_executable(sm_sim ${SOURCES})
 
