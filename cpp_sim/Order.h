@@ -1,9 +1,4 @@
-//
-// Created by Daniel Sterzel on 26/10/2025.
-//
-
-#ifndef ORDER_H
-#define ORDER_H
+#pragma once
 #include <chrono>
 
 struct Order {
@@ -16,4 +11,3 @@ struct Order {
 
 };
 
-#endif //ORDER_H
