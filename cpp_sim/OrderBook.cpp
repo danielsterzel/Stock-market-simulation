@@ -1,6 +1,7 @@
 #include "OrderBook.h"
 
 
+
 void OrderBook::addOrder(const Order &order) {
     if (order.isBid) {
         auto &queue = bids[order.price];
@@ -11,7 +12,6 @@ void OrderBook::addOrder(const Order &order) {
     }
 }
 
-// Function 'std::optional<std::pair<double, double>> OrderBook::bestPrices() const' is not implemented
 [[nodiscard]] std::optional<std::pair<double, double> > OrderBook::bestPrices() const {
     //check is trade expired?
 
@@ -60,7 +60,7 @@ double OrderBook::spread() const {
     if (not bestBidAndAsk) {
         return std::numeric_limits<double>::quiet_NaN();
     }
-    const auto[bestBid, bestAsk] = *bestBidAndAsk;
+    const auto [bestBid, bestAsk] = *bestBidAndAsk;
     return bestAsk - bestBid;
 }
 
@@ -83,4 +83,41 @@ double OrderBook::getDepth(int levels) const {
     calculateTotalVolumeForSide(asks);
 
     return totalVolume;
+}
+
+OrderBook::Trade OrderBook::match() {
+    const auto bestBidIterator = bids.begin();
+    const auto bestAskIterator = asks.begin();
+
+    const auto bestBidPrice = bestBidIterator->first;
+    const auto bestAskPrice = bestAskIterator->first;
+
+    if (not(bestBidPrice >= bestAskPrice)) {
+        return std::nullopt;
+    }
+
+    Order &bid = bestBidIterator->second.front(); // we take the first order from order queue
+    Order &ask = bestAskIterator->second.front();
+
+    const int tradeQuantity = std::min(bid.quantity, ask.quantity);
+
+    // double tradePrice = ask.price; // this can be useful later for volatility later down the line
+
+    bid.quantity -= tradeQuantity;
+    ask.quantity -= tradeQuantity;
+
+
+    auto removeIfQuantityEqualsNone = [](auto bestMarketQuoteIterator, auto &orderBookSide, auto &order) {
+        if (order.quantity == 0 and not bestMarketQuoteIterator->second.empty()) {
+            bestMarketQuoteIterator->second.pop_front(); // remove from queue because quantity is 0
+        }
+        if (bestMarketQuoteIterator->second.empty()) {
+            orderBookSide.erase(bestMarketQuoteIterator); // remove queue if we have already processed all orders
+        }
+    };
+
+    removeIfQuantityEqualsNone(bestBidIterator, bids, bid);
+    removeIfQuantityEqualsNone(bestAskIterator, asks, ask);
+
+    return std::make_pair(bid, ask);
 }

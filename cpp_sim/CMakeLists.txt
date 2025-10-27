@@ -22,6 +22,7 @@ set(SOURCES
     AgentType.h
     Market.h
     Market.cpp
+    Trade.h
 )
 
 add_executable(sm_sim ${SOURCES})
