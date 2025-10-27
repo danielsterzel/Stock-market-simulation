@@ -19,6 +19,9 @@ set(SOURCES
     ConservativeAgent.h
     ConservativeAgent.cpp
     Logger.h
+    AgentType.h
+    Market.h
+    Market.cpp
 )
 
 add_executable(sm_sim ${SOURCES})
