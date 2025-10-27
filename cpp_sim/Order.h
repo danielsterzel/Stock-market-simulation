@@ -19,7 +19,7 @@ struct Order {
                                                      quantity(orderQuantity), timestamp(orderTimestamp), ttl(orderTTL) {
     }
 
-    [[nodiscard]] bool expired(const std::chrono::steady_clock::time_point now) const noexcept {
+    [[nodiscard]] bool expired(const std::chrono::steady_clock::time_point& now) const noexcept {
         return now - timestamp > ttl;
     }
 };

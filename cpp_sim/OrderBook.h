@@ -15,10 +15,10 @@ public:
     // decrease quantity if needed or remove exhausted trades.
     // return pair<bid,ask> or std::nullopt if no trades
     void purgeExpired(const std::chrono::steady_clock::time_point& now);
-    [[nodiscard]]double spread() const;
-    [[nodiscard]]double getDepth(int levels) const;
+    [[nodiscard]] double spread() const;
+    [[nodiscard]] double getDepth(int levels) const;
 private:
-    // optional std::vector<Trade> that stores transaction history.
+    // optional std::vector<Trade> that stores transaction history?
     Bids bids;
     Asks asks;
 };
