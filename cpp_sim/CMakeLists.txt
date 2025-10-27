@@ -15,7 +15,7 @@ set(SOURCES
     Agent.h
     AggressiveAgent.h
     AggressiveAgent.cpp
-    Action.h
+        OrderType.h
     ConservativeAgent.h
     ConservativeAgent.cpp
     Logger.h

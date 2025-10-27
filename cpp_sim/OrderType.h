@@ -1,6 +1,6 @@
 #pragma once
 
-enum class ActionType{
+enum class OrderType{
   MARKETORDER,
   LIMITORDER,
   CANCELORDER
