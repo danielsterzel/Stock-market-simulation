@@ -24,9 +24,7 @@ struct Order {
     [[nodiscard]] bool expired(const std::chrono::steady_clock::time_point &now) const noexcept {
         return now - timestamp > ttl;
     }
-    static bool isEmpty() {
-        return false;
-    }
+    static constexpr bool isEmpty = false;
 };
 
 struct EmptyOrder : Order {
@@ -34,7 +32,5 @@ struct EmptyOrder : Order {
     : Order(OrderType::CANCELORDER, false, 0.0, 0,
             std::chrono::steady_clock::time_point{},
             std::chrono::milliseconds{0}) {}
-    static bool isEmpty() {
-        return true;
-    }
+    static constexpr bool isEmpty = true;
 };
