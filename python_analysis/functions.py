@@ -2,6 +2,8 @@ import matplotlib
 matplotlib.use('TkAgg')
 import matplotlib.pyplot as plt
 
+import pandas as pd
+
 def plot_spread_in_time(book):
     plt.plot(book['seconds_in_bucket'], book['spread'])
     plt.title(f"Wykres: spread w czasie")
@@ -37,3 +39,8 @@ def plot_bid_vs_ask(bid, ask):
     plt.title('Liczba zleceń po stronie Bid i Ask')
     plt.legend()
     plt.show()
+
+def read_csv_from_cpp_sim(name):
+    loc = f"../cpp_sim/{name}"
+    df = pd.read_csv(loc)
+    return df
