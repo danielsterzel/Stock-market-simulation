@@ -10,10 +10,10 @@ int main() {
 
     auto now = steady_clock::now();
 
-    Order bid1(OrderType::LIMITORDER, 1, true, 100.0, 10, now, 10s);
-    Order bid2(OrderType::LIMITORDER, 2, true, 99.5, 20, now, 10s);
-    Order ask1(OrderType::LIMITORDER, 3, false, 100.5, 20, now, 10s);
-    Order ask2(OrderType::LIMITORDER, 4, false, 101.0, 10, now, 10s);
+    Order bid1(OrderType::LIMITORDER, true, 100.0, 10, now, 10s);
+    Order bid2(OrderType::LIMITORDER, true, 99.5, 20, now, 10s);
+    Order ask1(OrderType::LIMITORDER, false, 100.5, 20, now, 10s);
+    Order ask2(OrderType::LIMITORDER, false, 101.0, 10, now, 10s);
 
     orderBook.addOrder(bid1);
     orderBook.addOrder(bid2);
@@ -32,7 +32,7 @@ int main() {
     std::print("Depth (2 levels): {}\n", orderBook.getDepth(2));
 
 
-    Order aggressiveBuy{OrderType::MARKETORDER, 5, true, 101.0, 5, now, 10s};
+    Order aggressiveBuy{OrderType::MARKETORDER, true, 101.0, 5, now, 10s};
     orderBook.addOrder(aggressiveBuy);
 
     if (auto trade = orderBook.match()) {
