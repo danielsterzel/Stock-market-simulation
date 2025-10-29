@@ -7,15 +7,16 @@
 
 class Agent {
 public:
-    explicit Agent(const AgentType t) : type(t), generator(std::random_device{}()), distribution(0.0, 1.0),
-                                        sizeDistribution(0, 100) {
+    explicit Agent(const AgentType t) : generator(std::random_device{}()), distribution(0.0, 1.0),
+                                        sizeDistribution(0, 100),
+                                        type(t) {
     }
 
     [[nodiscard]] AgentType getType() const {
         return type;
     }
 
-    virtual Order generateAction(const MarketStats& marketStats) = 0;
+    virtual Order generateAction(const MarketStats &marketStats, const std::chrono::steady_clock::time_point &now) = 0;
 
     virtual ~Agent() = default;
 

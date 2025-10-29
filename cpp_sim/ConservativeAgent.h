@@ -7,7 +7,7 @@ namespace Conservative {
     constexpr double TTL_LONG = 30;
 
     class ConservativeAgent final:public Agent {
-        Order generateAction(const MarketStats& marketStats) override;
+        Order generateAction(const MarketStats& marketStats, const std::chrono::steady_clock::time_point& now) override;
     private:
         AgentType type = AgentType::CONSERVATIVE;
 
