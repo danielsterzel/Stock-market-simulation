@@ -19,4 +19,5 @@ private:
     std::chrono::steady_clock::time_point now;
     // std::vector<MarketStats>;
     Logger logger;
+    Market();
 };
