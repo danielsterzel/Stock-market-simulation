@@ -3,6 +3,7 @@
 #include <random>
 #include "Order.h"
 #include "AgentType.h"
+#include "MarketStats.h"
 
 class Agent {
 public:
@@ -14,7 +15,7 @@ public:
         return type;
     }
 
-    virtual Order generateAction(double midPrice, std::chrono::steady_clock::time_point now) = 0;
+    virtual Order generateAction(const MarketStats& marketStats) = 0;
 
     virtual ~Agent() = default;
 

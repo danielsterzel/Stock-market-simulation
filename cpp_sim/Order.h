@@ -23,3 +23,5 @@ struct Order {
         return now - timestamp > ttl;
     }
 };
+
+struct EmptyOrder: Order {};

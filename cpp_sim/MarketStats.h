@@ -5,5 +5,6 @@ struct MarketStats {
     double midPrice;
     double spread;
     double depth;
+
 };
 

@@ -23,6 +23,7 @@ set(SOURCES
     Market.h
     Market.cpp
     Trade.h
+    MarketStats.h
 )
 
 add_executable(sm_sim ${SOURCES})
