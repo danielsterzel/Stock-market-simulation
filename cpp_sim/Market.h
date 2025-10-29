@@ -6,12 +6,6 @@
 #include "Agent.h"
 #include "Logger.h"
 
-struct MarketStats {
-    double midPrice;
-    double spread;
-    double depth;
-};
-
 class Market{
 
 public:

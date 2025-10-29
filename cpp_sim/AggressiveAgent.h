@@ -7,9 +7,6 @@ namespace Aggressive {
     class AggressiveAgent final : public Agent{
         AggressiveAgent();
         Order generateAction(double midPrice, std::chrono::steady_clock::time_point now) override;
-    private:
-        AgentType type;
-
     };
 }
 
