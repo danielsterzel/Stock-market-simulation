@@ -1,20 +1,20 @@
 //
 // Created by Daniel Sterzel on 27/10/2025.
 //
-#include <print>
 #include "Market.h"
+#include <print>
 
 Market::Market() {
     now = std::chrono::steady_clock::now();
+    initialPrice = 100.0;
 }
 
 void Market::step() {
-    MarketStats marketStats{};
-    marketStats.bestBid = initialPrice - 0.5;
-    marketStats.bestAsk = initialPrice + 0.5;
-    marketStats.midPrice = initialPrice;
-    marketStats.spread = 1.0;
-    marketStats.depth = 0.0;
+    static MarketStats lastStats {
+        99.5, 100.5, 100.0, 1.0, 0.0
+    };
+
+    MarketStats marketStats = lastStats;
 
     if (auto bestPrices = orderBook.bestPrices(); bestPrices) {
         marketStats.bestBid = bestPrices->first;
@@ -23,13 +23,6 @@ void Market::step() {
         marketStats.spread = orderBook.spread();
         marketStats.depth = orderBook.getDepth(5);
     }
-    // else {
-    //     marketStats.bestBid = 0.0;
-    //     marketStats.bestAsk = 0.0;
-    //     marketStats.midPrice = 0.0;
-    //     marketStats.spread = 0.0;
-    //     marketStats.depth = 0.0;
-    // }
 
     for (const auto &agentPtr : agents) {
         Order order = agentPtr->generateAction(marketStats, now);
@@ -38,12 +31,32 @@ void Market::step() {
         }
     }
 
+
     orderBook.purgeExpired(now);
 
+    bool anyTrade = false;
     while (auto trade = orderBook.match()) {
-        //logger
+        const auto& [bidOrder, askOrder] = *trade;
+
+        double tradePrice = (bidOrder.price + askOrder.price) / 2.0;
+
+
+        initialPrice = tradePrice;
+
+        //logger.logTrade(tradePrice, bidOrder.quantity);
     }
 
+    if (!anyTrade) {
+        if (auto bestPrices = orderBook.bestPrices(); bestPrices) {
+            const auto [bid, ask] = *bestPrices;
+            initialPrice = (bid + ask) / 2.0;
+        } else {
+            static std::uniform_real_distribution<double> noiseDist(-0.01, 0.01);
+            initialPrice += noiseDist(generator);
+        }
+    }
+
+    lastStats = marketStats;
     now += std::chrono::milliseconds(1);
 }
 
@@ -62,6 +75,7 @@ void Market::logState() {
         logger.logToCsvFormat(bestBid, bestAsk, spread, depth);
     }
 }
-Market::AgentContainer& Market::getAgentContainer(){
+
+Market::AgentContainer& Market::getAgentContainer() {
     return agents;
 }

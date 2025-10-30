@@ -21,6 +21,7 @@ private:
     OrderBook orderBook;
     AgentContainer agents;
     std::chrono::steady_clock::time_point now;
-    int initialPrice = 100;
+    double initialPrice = 100;
+    std::mt19937 generator{std::random_device{}()};
     // std::vector<MarketStats>;
 };
