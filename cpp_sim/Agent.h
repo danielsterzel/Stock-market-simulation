@@ -8,7 +8,7 @@
 class Agent {
 public:
     explicit Agent(const AgentType t) : generator(std::random_device{}()), distribution(0.0, 1.0),
-                                        sizeDistribution(0, 100),
+                                        sizeDistribution(1, 100),
                                         type(t) {
     }
 

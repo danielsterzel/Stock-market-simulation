@@ -86,6 +86,9 @@ double OrderBook::getDepth(int levels) const {
 }
 
 OrderBook::Trade OrderBook::match() {
+    if (bids.empty() or asks.empty()) {
+        return std::nullopt;
+    }
     const auto bestBidIterator = bids.begin();
     const auto bestAskIterator = asks.begin();
 

@@ -15,6 +15,9 @@ public:
         auto writeMode = std::ios::out;
         writeMode |= overwriteFile ? std::ios::trunc : std::ios::app;
 
+        // 1111
+        // 0100 std::ios::out
+        //
         file.open(filePath, writeMode);
         if (not file.is_open()) {
             throw std::runtime_error("Failed to open log file " + filePath);

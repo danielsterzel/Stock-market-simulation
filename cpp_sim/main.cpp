@@ -1,54 +1,72 @@
+#include <iostream>
 #include <print>
-// #include "Logger.h"
+#include "AggressiveAgent.h"
+#include "ConservativeAgent.h"
+#include "Market.h"
 #include "Order.h"
 #include "OrderBook.h"
 
+constexpr int ITERATIONS_COUNT = 1000;
+
+int numOfAggressiveAgents(const std::vector<std::unique_ptr<Agent> > &agents) {
+    int aggressiveAgentCount = 0;
+    for (const auto &agent: agents) {
+        if (agent->getType() == AgentType::AGGRESSIVE) {
+            aggressiveAgentCount++;
+        }
+    }
+    return aggressiveAgentCount;
+}
+
 int main() {
-    using namespace std::chrono;
+    try {
+        Market market;
 
-    OrderBook orderBook;
+        Market::logger.openFile("../logs/market.csv");
+        Market::logger.logToCsvFormat("BestBid","BestAsk","Spread", "Depth");
+        auto &agents = market.getAgentContainer();
 
-    auto now = steady_clock::now();
+        // auto prepopulateAgentsRandomly = [&agents](const int numOfAgents) {
+        //     std::mt19937 generator(std::random_device{}());
+        //     std::uniform_real_distribution<> distribution(0, 1.0);
+        //
+        //     for (int index = 0; index < numOfAgents; index++) {
+        //         if (const double agentType = distribution(generator); agentType <= 0.5) {
+        //             agents.push_back(std::make_unique<Conservative::ConservativeAgent>());
+        //         } else {
+        //             agents.push_back(std::make_unique<Aggressive::AggressiveAgent>());
+        //         }
+        //     }
+        // };
+        auto proportionalAgentPrePopulation = [&agents](const int agentCount, const double aggressiveAgentProportions) {
+            if (aggressiveAgentProportions < 0 or aggressiveAgentProportions > 1.0) {
+                std::cerr << "Choose between 0 and 1.0\n";
+                return;
+            }
 
-    Order bid1(OrderType::LIMITORDER, true, 100.0, 10, now, 10s);
-    Order bid2(OrderType::LIMITORDER, true, 99.5, 20, now, 10s);
-    Order ask1(OrderType::LIMITORDER, false, 100.5, 20, now, 10s);
-    Order ask2(OrderType::LIMITORDER, false, 101.0, 10, now, 10s);
+            const int finalAggressiveAgentCount = std::floor(agentCount * aggressiveAgentProportions);
+            for (int index = 0; index < finalAggressiveAgentCount; index++) {
+                agents.push_back(std::make_unique<Aggressive::AggressiveAgent>());
+            }
 
-    orderBook.addOrder(bid1);
-    orderBook.addOrder(bid2);
-    orderBook.addOrder(ask1);
-    orderBook.addOrder(ask2);
+            const int conservativeAgentCount = agentCount - finalAggressiveAgentCount;
 
-    if (const auto best = orderBook.bestPrices()) {
-        auto [bidPrice, askPrice] = *best;
-        std::print("Best bid price: {} \nBest ask price {}\n", bidPrice, askPrice);
-    } else {
-        std::print("Book is empty");
+            for (int index = 0; index < conservativeAgentCount; index++) {
+                agents.push_back(std::make_unique<Conservative::ConservativeAgent>());
+            }
+        };
+
+        // prepopulateAgents(100);
+        proportionalAgentPrePopulation(100, 0.70);
+        std::print("Num of aggressive agent: {}\n", numOfAggressiveAgents(agents));
+
+        market.logState();
+        market.run(ITERATIONS_COUNT);
+        market.logState();
+        std::print("Number of agents in simulation {}\n", agents.size());
+
+        std::print("Simulation done");
+    } catch (const std::exception &e) {
+        std::print("Error {}\n", e.what());
     }
-
-    std::print("Spread: {}\n", orderBook.spread());
-
-    std::print("Depth (2 levels): {}\n", orderBook.getDepth(2));
-
-
-    Order aggressiveBuy{OrderType::MARKETORDER, true, 101.0, 5, now, 10s};
-    orderBook.addOrder(aggressiveBuy);
-
-    if (auto trade = orderBook.match()) {
-        std::print("Trade occurred\n");
-        std::print("Bid id: {} | Ask id: {}\n", trade->first.id, trade->second.id);
-        std::print("Remaining quantity in bid: {} | Remaining quantity in ask: {}\n", trade->first.quantity,
-                   trade->second.quantity);
-    }else {
-        std::print("no match yet");
-    }
-
-    auto futureTimeStamp = now + 20s;
-    orderBook.purgeExpired(futureTimeStamp);
-    std::print("After purging expired orders\n");
-
-    std::print("Spread: {}\n", orderBook.spread());
-
-    return 0;
 }
