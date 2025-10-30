@@ -16,7 +16,10 @@ namespace Aggressive {
         if (type == OrderType::MARKETORDER) {
             price = isBuy ? marketStats.bestAsk : marketStats.bestBid;
         } else {
-            const double timeOffset = (distribution(generator) - 0.5) * marketStats.spread * 0.5;
+            constexpr double epsilon = 0.0005;
+            std::normal_distribution<double> volatilityNoise(0.0, 0.002);
+            const double baseOffset = std::max(marketStats.spread, epsilon);
+            const double timeOffset = ((distribution(generator) - 0.5) * baseOffset * 10.0) + volatilityNoise(generator);
             price = marketStats.midPrice + (isBuy ? -timeOffset : timeOffset);
         }
         const int quantity = sizeDistribution(generator);

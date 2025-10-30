@@ -16,6 +16,14 @@ void Market::step() {
 
     MarketStats marketStats = lastStats;
 
+    static std::default_random_engine rng(std::random_device{}());
+    static std::normal_distribution<double> drift(0.0, 0.05);
+    fundamentalValue += drift(rng);
+
+    marketStats.midPrice = fundamentalValue;
+    marketStats.bestBid  = fundamentalValue - 0.5;
+    marketStats.bestAsk  = fundamentalValue + 0.5;
+
     if (auto bestPrices = orderBook.bestPrices(); bestPrices) {
         marketStats.bestBid = bestPrices->first;
         marketStats.bestAsk = bestPrices->second;

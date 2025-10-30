@@ -24,4 +24,8 @@ private:
     double initialPrice = 100;
     std::mt19937 generator{std::random_device{}()};
     // std::vector<MarketStats>;
+
+    double fundamentalValue = 100.0;
+    std::normal_distribution<double> driftDist{0.0, 0.05};
+
 };
