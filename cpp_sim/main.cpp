@@ -21,8 +21,8 @@ int main() {
     try {
         Market market;
 
-        Market::logger.openFile("../logs/market.csv", true);
-        Market::logger.logToCsvFormat("BestBid","BestAsk","Spread", "Depth");
+        // market.marketStatsLogger.openFile("", true);
+
         auto &agents = market.getAgentContainer();
         // auto prepopulateAgentsRandomly = [&agents](const int numOfAgents) {
         //     std::mt19937 generator(std::random_device{}());

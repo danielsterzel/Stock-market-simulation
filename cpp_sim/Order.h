@@ -35,3 +35,18 @@ struct EmptyOrder : Order {
             std::chrono::milliseconds{0}) {}
     static constexpr bool isEmpty = true;
 };
+
+inline std::ostream& operator<<(std::ostream& os, const Order& order) {
+    os << "id: " << order.id
+    << ", type: " << order.orderType
+    << ", side: " << (order.isBid ? "BID" : "ASK")
+    << ", price: " << order.price
+    << ", quantity: " << order.quantity
+    << ", ttl: " << order.ttl.count() << "ms";
+    return os;
+}
+
+inline std::ostream& operator<<(std::ostream& os, const EmptyOrder& eo) {
+    os << "[EmptyOrder id=" << eo.id << "]";
+    return os;
+}

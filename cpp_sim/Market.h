@@ -14,7 +14,8 @@ public:
     void run(size_t steps);
     void logState() const;
     AgentContainer& getAgentContainer();
-    mutable Logger logger = {};
+    mutable Logger marketStatsLogger = {};
+    mutable Logger agentActionLogger = {};
 
 private:
     OrderBook orderBook;

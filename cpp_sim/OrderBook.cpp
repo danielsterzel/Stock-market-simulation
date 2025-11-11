@@ -1,7 +1,6 @@
 #include "OrderBook.h"
 
 
-
 void OrderBook::addOrder(const Order &order) {
     if (order.isBid) {
         auto &queue = bids[order.price];
@@ -30,18 +29,19 @@ void OrderBook::addOrder(const Order &order) {
 
 void OrderBook::purgeExpired(const std::chrono::steady_clock::time_point &now) {
     //side means side of the order book either bids or asks.
-
-    auto purgeSide = [&now](auto &side) {
+    auto purgeSide = [&now, this](auto &side) {
         for (auto it = side.begin(); it != side.end();) {
             auto &queue = it->second;
-            queue.erase(
-                std::remove_if(queue.begin(), queue.end(),
-                               [&](const Order &o) {
-                                   return o.expired(now);
-                               }),
-
-                queue.end()
-            );
+            const auto firstExpiredOrder = std::remove_if(queue.begin(), queue.end(),
+                           [&](const Order &o) {
+                               return o.expired(now);
+                           });
+            if (logPurgedOrderFunction) {
+                for (auto logIterator = firstExpiredOrder; logIterator != queue.end(); ++logIterator) {
+                    logPurgedOrderFunction(*logIterator);
+                }
+            }
+            queue.erase(firstExpiredOrder, queue.end());
 
             if (queue.empty()) {
                 it = side.erase(it);
@@ -123,4 +123,8 @@ OrderBook::Trade OrderBook::match() {
     removeIfQuantityEqualsNone(bestAskIterator, asks, ask);
 
     return std::make_pair(bid, ask);
+}
+
+void OrderBook::setOrderPurgeCallback(OrderPurgeCallback callBack) {
+    logPurgedOrderFunction = std::move(callBack);
 }

@@ -21,15 +21,42 @@ public:
         }
         isFileCreated = true;
     }
+    // void writeAction(const std::string& actionDescription) {
+    //
+    // }
+    template<typename AgentType, typename OrderT>
+    void writeAction(const AgentType& agentType,const OrderT& order) {
+
+        file << std::format("{:%Y-%m-%d %H:%M:%S} ", std::chrono::system_clock::now());
+        writeField("Agent of type: ");
+        writeField(agentType);
+        file << '\n';
+        writeField("Created Order: ");
+        writeField(order);
+        file << "\n\n";
+        file.flush();
+    }
+    void writeCsvHeaders(std::initializer_list<std::string> headers) {
+        if (not isFileCreated) throw std::runtime_error("File not opened before writing header");
+
+        bool first = true;
+        for (const auto& h: headers) {
+            if (not first) file << ',';
+            file << escapeCsv(h);
+            first = false;
+        }
+        file << '\n';
+        file.flush();
+    }
 
     template<typename First, typename... Rest>
     void logToCsvFormat(First &&first, Rest &&... rest){
         if (not isFileCreated) {
             throw std::runtime_error("Log file has not been opened before trying to write in it");
         }
-        // std::lock_guard<std::mutex> lock(mtx); // for thread safety
+        // std::lock_guard<std::mutex> lock(mtx); // for thread safety maybe if we decide to run market sims on multiple threads
+        // if we decide that we need to think if using flush() everytime we write one line will hinder performance.
         file << std::format("{:%Y-%m-%d %H:%M:%S},",std::chrono::system_clock::now());
-        // file << std::forward<First>(first);
         writeField(std::forward<First>(first));
         ((file << ',', writeField(std::forward<Rest>(rest))), ...);
         file << '\n';
@@ -43,8 +70,6 @@ public:
     }
 
 private:
-    std::ofstream file;
-    bool isFileCreated{false};
     template<typename  T>
     void writeField(T&& value) {
         // if it can be implicitly converted to a string like object use escapeCsv
@@ -54,7 +79,8 @@ private:
         }
         file << std::forward<T>(value);
     }
-    static inline std::string escapeCsv(const std::string_view inputString){
+    // dałem static bo mnie clang męczy :((((
+    static std::string escapeCsv(const std::string_view inputString){
 
         if (inputString.find_first_of("\",\n") == std::string::npos) return std::string(inputString);
         std::string out;
@@ -69,5 +95,8 @@ private:
         out.push_back('"');
         return out;
     }
+
+    std::ofstream file;
+    bool isFileCreated{false};
 
 };

@@ -6,6 +6,9 @@
 
 Market::Market() {
     now = std::chrono::steady_clock::now();
+    orderBook.setOrderPurgeCallback([this](const Order& o) {
+        agentActionLogger.writeAction("PURGED", o);
+    });
     initialPrice = 100.0;
 }
 
@@ -37,6 +40,7 @@ void Market::step() {
         if (order.quantity > 0) {
             orderBook.addOrder(order);
         }
+        agentActionLogger.writeAction(agentPtr->getType(), order);
     }
 
 
@@ -69,6 +73,9 @@ void Market::step() {
 }
 
 void Market::run(const size_t steps) {
+    marketStatsLogger.openFile("../logs/market.csv", true);
+    marketStatsLogger.writeCsvHeaders({"Time","BestBid","BestAsk","Spread", "Depth"});
+    agentActionLogger.openFile("../logs/marketActions.txt", true);
     for (size_t i = 0; i < steps; ++i) {
         step();
         logState();
@@ -80,7 +87,7 @@ void Market::logState() const{
         const auto [bestBid, bestAsk] = *bestPrices;
         const double spread = orderBook.spread();
         const double depth = orderBook.getDepth(5);
-        logger.logToCsvFormat(bestBid, bestAsk, spread, depth);
+        marketStatsLogger.logToCsvFormat(bestBid, bestAsk, spread, depth);
     }
 }
 
