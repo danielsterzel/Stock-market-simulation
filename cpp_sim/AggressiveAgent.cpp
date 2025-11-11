@@ -23,10 +23,10 @@ namespace Aggressive {
         if (type == OrderType::MARKETORDER) {
             price = isBuy ? marketStats.bestAsk : marketStats.bestBid;
         } else {
-            constexpr double epsilon = 0.0001; // minimalny spread
-            std::normal_distribution<double> volatilityNoise(0.0, 0.005); // większe wahania dla agresywnego agenta
+            constexpr double epsilon = 0.0001;
+            std::normal_distribution<double> volatilityNoise(0.0, 0.005);
             const double baseOffset = std::max(marketStats.spread, epsilon);
-            const double timeOffset = ((distribution(generator) - 0.5) * baseOffset * 20.0) + volatilityNoise(generator);
+            const double timeOffset = ((distribution(generator) - 0.5) * baseOffset * 50.0) + volatilityNoise(generator);
             price = marketStats.midPrice + (isBuy ? -timeOffset : timeOffset);
         }
 
@@ -35,7 +35,7 @@ namespace Aggressive {
         const double ttlSeconds = std::uniform_real_distribution<double>(TTL_SHORT, TTL_LONG)(generator);
         const std::chrono::milliseconds ttl(static_cast<int>(ttlSeconds * 1000));
 
-        return Order(type, isBuy, price, quantity, now, ttl);
+        return {type, isBuy, price, quantity, now, ttl};
     }
 
 }

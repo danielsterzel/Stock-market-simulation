@@ -8,13 +8,17 @@
 #include "Order.h"
 // #include "Trade.h" // TODO: Return Trade struct instead of std::optional<std::pair<Order, Order>>
 
+
+// bids
+// 100.5 [order1, order2, order3]
+//  99.4 [order4 ...]
+
 class OrderBook {
 public:
     using Queue = std::deque<Order>;
     using Bids = std::map<double, Queue, std::greater<>>;
     using Asks = std::map<double, Queue>;
     using Trade = std::optional<std::pair<Order, Order>>;
-
 
     void addOrder(const Order& order);
     [[nodiscard]] std::optional<std::pair<double, double>> bestPrices() const;

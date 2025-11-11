@@ -4,9 +4,8 @@
 #include "ConservativeAgent.h"
 #include "Market.h"
 #include "Order.h"
-// #include "OrderBook.h"
 
-constexpr int ITERATIONS_COUNT = 100;
+constexpr int ITERATIONS_COUNT = 10000;
 
 int numOfAggressiveAgents(const std::vector<std::unique_ptr<Agent> > &agents) {
     int aggressiveAgentCount = 0;
@@ -25,7 +24,6 @@ int main() {
         Market::logger.openFile("../logs/market.csv", true);
         Market::logger.logToCsvFormat("BestBid","BestAsk","Spread", "Depth");
         auto &agents = market.getAgentContainer();
-
         // auto prepopulateAgentsRandomly = [&agents](const int numOfAgents) {
         //     std::mt19937 generator(std::random_device{}());
         //     std::uniform_real_distribution<> distribution(0, 1.0);
@@ -38,6 +36,7 @@ int main() {
         //         }
         //     }
         // };
+
         auto proportionalAgentPrePopulation = [&agents](const int agentCount, const double aggressiveAgentProportions) {
             if (aggressiveAgentProportions < 0 or aggressiveAgentProportions > 1.0) {
                 std::cerr << "Choose between 0 and 1.0\n";
@@ -57,7 +56,7 @@ int main() {
         };
 
         // prepopulateAgents(100);
-        proportionalAgentPrePopulation(1000, 0.03);
+        proportionalAgentPrePopulation(100, 0.3);
         std::print("Num of aggressive agent: {}\n", numOfAggressiveAgents(agents));
 
         market.logState();

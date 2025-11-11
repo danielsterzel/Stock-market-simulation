@@ -2,7 +2,7 @@
 // Created by Daniel Sterzel on 27/10/2025.
 //
 #include "Market.h"
-#include <print>
+// #include <print>
 
 Market::Market() {
     now = std::chrono::steady_clock::now();
@@ -24,7 +24,7 @@ void Market::step() {
     marketStats.bestBid  = fundamentalValue - 0.5;
     marketStats.bestAsk  = fundamentalValue + 0.5;
 
-    if (auto bestPrices = orderBook.bestPrices(); bestPrices) {
+    if (const auto bestPrices = orderBook.bestPrices(); bestPrices) {
         marketStats.bestBid = bestPrices->first;
         marketStats.bestAsk = bestPrices->second;
         marketStats.midPrice = (marketStats.bestBid + marketStats.bestAsk) / 2.0;
@@ -54,7 +54,7 @@ void Market::step() {
         //logger.logTrade(tradePrice, bidOrder.quantity);
     }
 
-    if (!anyTrade) {
+    if (not anyTrade) {
         if (auto bestPrices = orderBook.bestPrices(); bestPrices) {
             const auto [bid, ask] = *bestPrices;
             initialPrice = (bid + ask) / 2.0;
@@ -68,14 +68,14 @@ void Market::step() {
     now += std::chrono::milliseconds(1);
 }
 
-void Market::run(size_t steps) {
+void Market::run(const size_t steps) {
     for (size_t i = 0; i < steps; ++i) {
         step();
         logState();
     }
 }
 
-void Market::logState() {
+void Market::logState() const{
     if (auto bestPrices = orderBook.bestPrices(); bestPrices) {
         const auto [bestBid, bestAsk] = *bestPrices;
         const double spread = orderBook.spread();

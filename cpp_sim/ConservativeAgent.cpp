@@ -21,7 +21,7 @@ namespace Conservative {
         } else {
             double maxOffset = 0.5;
             std::normal_distribution<double> noise(0.0, 0.05);
-            double offset = ((distribution(generator) - 0.5) * 2.0 * maxOffset) + noise(generator);
+            double offset = ((distribution(generator) - 0.5) * 5.0 * maxOffset) + noise(generator);
             price = marketStats.midPrice + (isBuy ? -offset : offset);
 
             const double tickSize = 0.01;

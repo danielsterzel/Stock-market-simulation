@@ -27,6 +27,7 @@ struct Order {
     static constexpr bool isEmpty = false;
 };
 
+
 struct EmptyOrder : Order {
     EmptyOrder()
     : Order(OrderType::CANCELORDER, false, 0.0, 0,

@@ -12,10 +12,9 @@ public:
     Market();
     void step();
     void run(size_t steps);
-    void logState();
+    void logState() const;
     AgentContainer& getAgentContainer();
-    static inline Logger logger{};
-
+    mutable Logger logger = {};
 
 private:
     OrderBook orderBook;
