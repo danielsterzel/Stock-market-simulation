@@ -32,7 +32,7 @@ struct EmptyOrder : Order {
     EmptyOrder()
     : Order(OrderType::CANCELORDER, false, 0.0, 0,
             std::chrono::steady_clock::time_point{},
-            std::chrono::milliseconds{0}) {}
+            std::chrono::milliseconds{}) {}
     static constexpr bool isEmpty = true;
 };
 

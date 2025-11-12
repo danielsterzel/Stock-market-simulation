@@ -2,6 +2,8 @@
 // Created by Daniel Sterzel on 27/10/2025.
 //
 #include "Market.h"
+
+#include <iostream>
 // #include <print>
 
 Market::Market() {
@@ -13,10 +15,7 @@ Market::Market() {
 }
 
 void Market::step() {
-    static MarketStats lastStats {
-        99.5, 100.5, 100.0, 1.0, 0.0
-    };
-
+    static MarketStats lastStats { 99.5, 100.5, 100.0, 1.0, 0.0 };
     MarketStats marketStats = lastStats;
 
     static std::default_random_engine rng(std::random_device{}());
@@ -26,8 +25,10 @@ void Market::step() {
     marketStats.midPrice = fundamentalValue;
     marketStats.bestBid  = fundamentalValue - 0.5;
     marketStats.bestAsk  = fundamentalValue + 0.5;
+    marketStats.spread = marketStats.bestAsk - marketStats.bestBid;
+    marketStats.depth = 0.0;
 
-    if (const auto bestPrices = orderBook.bestPrices(); bestPrices) {
+    if (auto bestPrices = orderBook.bestPrices(); bestPrices) {
         marketStats.bestBid = bestPrices->first;
         marketStats.bestAsk = bestPrices->second;
         marketStats.midPrice = (marketStats.bestBid + marketStats.bestAsk) / 2.0;
@@ -37,39 +38,23 @@ void Market::step() {
 
     for (const auto &agentPtr : agents) {
         Order order = agentPtr->generateAction(marketStats, now);
-        if (order.quantity > 0) {
-            orderBook.addOrder(order);
-        }
+        // Logowanie akcji agenta
         agentActionLogger.writeAction(agentPtr->getType(), order);
-    }
 
+        if (order.quantity > 0) {
+            std::vector<Trade> newTrades = orderBook.processOrder(order, now);
+            if (!newTrades.empty()) {
+                tradeHistory.insert(tradeHistory.end(), newTrades.begin(), newTrades.end());
+            }
+        }
+    }
 
     orderBook.purgeExpired(now);
 
-    bool anyTrade = false;
-    while (auto trade = orderBook.match()) {
-        const auto& [bidOrder, askOrder] = *trade;
-
-        double tradePrice = (bidOrder.price + askOrder.price) / 2.0;
-
-
-        initialPrice = tradePrice;
-
-        //logger.logTrade(tradePrice, bidOrder.quantity);
-    }
-
-    if (not anyTrade) {
-        if (auto bestPrices = orderBook.bestPrices(); bestPrices) {
-            const auto [bid, ask] = *bestPrices;
-            initialPrice = (bid + ask) / 2.0;
-        } else {
-            static std::uniform_real_distribution<double> noiseDist(-0.01, 0.01);
-            initialPrice += noiseDist(generator);
-        }
-    }
-
     lastStats = marketStats;
-    now += std::chrono::milliseconds(1);
+    now += std::chrono::milliseconds(static_cast<long long>(1));
+
+    //logLiveState();
 }
 
 void Market::run(const size_t steps) {
@@ -89,6 +74,18 @@ void Market::logState() const{
         const double depth = orderBook.getDepth(5);
         marketStatsLogger.logToCsvFormat(bestBid, bestAsk, spread, depth);
     }
+}
+
+void Market::logLiveState() const {
+    if (auto bestPrices = orderBook.bestPrices(); bestPrices) {
+        const auto [bestBid, bestAsk] = *bestPrices;
+        std::cout << bestBid << "," << bestAsk << "\n";
+        std::cout << std::flush;
+    }
+}
+
+const std::vector<Trade>& Market::getTradeHistory() const {
+    return tradeHistory;
 }
 
 Market::AgentContainer& Market::getAgentContainer() {

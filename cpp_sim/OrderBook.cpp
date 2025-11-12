@@ -1,6 +1,82 @@
 #include "OrderBook.h"
 
 
+std::vector<Trade> OrderBook::processOrder(Order &incomingOrder, const std::chrono::steady_clock::time_point &now) {
+    std::vector<Trade> trades;
+
+    if (incomingOrder.orderType == OrderType::MARKETORDER) {
+        if (incomingOrder.isBid) { // Market Buy
+            while (incomingOrder.quantity > 0 && !asks.empty()) {
+                auto bestAskIt = asks.begin();
+                auto& askQueue = bestAskIt->second;
+                Order& restingOrder = askQueue.front();
+
+                int tradeQuantity = std::min(incomingOrder.quantity, restingOrder.quantity);
+                trades.emplace_back(incomingOrder, restingOrder, tradeQuantity, now);
+
+                incomingOrder.quantity -= tradeQuantity;
+                restingOrder.quantity -= tradeQuantity;
+
+                if (restingOrder.quantity == 0) askQueue.pop_front();
+                if (askQueue.empty()) asks.erase(bestAskIt);
+            }
+        } else { // Market Sell
+            while (incomingOrder.quantity > 0 && !bids.empty()) {
+                auto bestBidIt = bids.begin();
+                auto& bidQueue = bestBidIt->second;
+                Order& restingOrder = bidQueue.front();
+
+                int tradeQuantity = std::min(incomingOrder.quantity, restingOrder.quantity);
+                trades.emplace_back(restingOrder, incomingOrder, tradeQuantity, now);
+
+                incomingOrder.quantity -= tradeQuantity;
+                restingOrder.quantity -= tradeQuantity;
+
+                if (restingOrder.quantity == 0) bidQueue.pop_front();
+                if (bidQueue.empty()) bids.erase(bestBidIt);
+            }
+        }
+    } else if (incomingOrder.orderType == OrderType::LIMITORDER) {
+        if (incomingOrder.isBid) { // Limit Buy
+            while (incomingOrder.quantity > 0 && !asks.empty() && incomingOrder.price >= asks.begin()->first) {
+                auto bestAskIt = asks.begin();
+                auto& askQueue = bestAskIt->second;
+                Order& restingOrder = askQueue.front();
+
+                int tradeQuantity = std::min(incomingOrder.quantity, restingOrder.quantity);
+                trades.emplace_back(incomingOrder, restingOrder, tradeQuantity, now);
+
+                incomingOrder.quantity -= tradeQuantity;
+                restingOrder.quantity -= tradeQuantity;
+
+                if (restingOrder.quantity == 0) askQueue.pop_front();
+                if (askQueue.empty()) asks.erase(bestAskIt);
+            }
+        } else { // Limit Sell
+             while (incomingOrder.quantity > 0 && !bids.empty() && incomingOrder.price <= bids.begin()->first) {
+                auto bestBidIt = bids.begin();
+                auto& bidQueue = bestBidIt->second;
+                Order& restingOrder = bidQueue.front();
+
+                int tradeQuantity = std::min(incomingOrder.quantity, restingOrder.quantity);
+                trades.emplace_back(restingOrder, incomingOrder, tradeQuantity, now);
+
+                incomingOrder.quantity -= tradeQuantity;
+                restingOrder.quantity -= tradeQuantity;
+
+                if (restingOrder.quantity == 0) bidQueue.pop_front();
+                if (bidQueue.empty()) bids.erase(bestBidIt);
+            }
+        }
+
+        if (incomingOrder.quantity > 0) {
+            addOrder(incomingOrder);
+        }
+    }
+
+    return trades;
+}
+
 void OrderBook::addOrder(const Order &order) {
     if (order.isBid) {
         auto &queue = bids[order.price];
@@ -85,45 +161,45 @@ double OrderBook::getDepth(int levels) const {
     return totalVolume;
 }
 
-OrderBook::Trade OrderBook::match() {
-    if (bids.empty() or asks.empty()) {
-        return std::nullopt;
-    }
-    const auto bestBidIterator = bids.begin();
-    const auto bestAskIterator = asks.begin();
-
-    const auto bestBidPrice = bestBidIterator->first;
-    const auto bestAskPrice = bestAskIterator->first;
-
-    if (not(bestBidPrice >= bestAskPrice)) {
-        return std::nullopt;
-    }
-
-    Order &bid = bestBidIterator->second.front(); // we take the first order from order queue
-    Order &ask = bestAskIterator->second.front();
-
-    const int tradeQuantity = std::min(bid.quantity, ask.quantity);
-
-    // double tradePrice = ask.price; // this can be useful later for volatility later down the line
-
-    bid.quantity -= tradeQuantity;
-    ask.quantity -= tradeQuantity;
-
-
-    auto removeIfQuantityEqualsNone = [](auto bestMarketQuoteIterator, auto &orderBookSide, auto &order) {
-        if (order.quantity == 0 and not bestMarketQuoteIterator->second.empty()) {
-            bestMarketQuoteIterator->second.pop_front(); // remove from queue because quantity is 0
-        }
-        if (bestMarketQuoteIterator->second.empty()) {
-            orderBookSide.erase(bestMarketQuoteIterator); // remove queue if we have already processed all orders
-        }
-    };
-
-    removeIfQuantityEqualsNone(bestBidIterator, bids, bid);
-    removeIfQuantityEqualsNone(bestAskIterator, asks, ask);
-
-    return std::make_pair(bid, ask);
-}
+// OrderBook::Trade OrderBook::match() {
+//     if (bids.empty() or asks.empty()) {
+//         return std::nullopt;
+//     }
+//     const auto bestBidIterator = bids.begin();
+//     const auto bestAskIterator = asks.begin();
+//
+//     const auto bestBidPrice = bestBidIterator->first;
+//     const auto bestAskPrice = bestAskIterator->first;
+//
+//     if (not(bestBidPrice >= bestAskPrice)) {
+//         return std::nullopt;
+//     }
+//
+//     Order &bid = bestBidIterator->second.front(); // we take the first order from order queue
+//     Order &ask = bestAskIterator->second.front();
+//
+//     const int tradeQuantity = std::min(bid.quantity, ask.quantity);
+//
+//     // double tradePrice = ask.price; // this can be useful later for volatility later down the line
+//
+//     bid.quantity -= tradeQuantity;
+//     ask.quantity -= tradeQuantity;
+//
+//
+//     auto removeIfQuantityEqualsNone = [](auto bestMarketQuoteIterator, auto &orderBookSide, auto &order) {
+//         if (order.quantity == 0 and not bestMarketQuoteIterator->second.empty()) {
+//             bestMarketQuoteIterator->second.pop_front(); // remove from queue because quantity is 0
+//         }
+//         if (bestMarketQuoteIterator->second.empty()) {
+//             orderBookSide.erase(bestMarketQuoteIterator); // remove queue if we have already processed all orders
+//         }
+//     };
+//
+//     removeIfQuantityEqualsNone(bestBidIterator, bids, bid);
+//     removeIfQuantityEqualsNone(bestAskIterator, asks, ask);
+//
+//     return std::make_pair(bid, ask);
+// }
 
 void OrderBook::setOrderPurgeCallback(OrderPurgeCallback callBack) {
     logPurgedOrderFunction = std::move(callBack);

@@ -16,6 +16,9 @@ public:
     AgentContainer& getAgentContainer();
     mutable Logger marketStatsLogger = {};
     mutable Logger agentActionLogger = {};
+    void logLiveState() const;
+
+    const std::vector<Trade>& getTradeHistory() const;
 
 private:
     OrderBook orderBook;
@@ -23,6 +26,7 @@ private:
     std::chrono::steady_clock::time_point now;
     double initialPrice = 100;
     std::mt19937 generator{std::random_device{}()};
+    std::vector<Trade> tradeHistory;
     // std::vector<MarketStats>;
 
     double fundamentalValue = 100.0;
