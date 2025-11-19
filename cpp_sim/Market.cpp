@@ -91,3 +91,54 @@ const std::vector<Trade>& Market::getTradeHistory() const {
 Market::AgentContainer& Market::getAgentContainer() {
     return agents;
 }
+
+void Market::triggerCrash(double severity) {
+    if (severity > 1.0) severity = 1.0;
+    std::cout << "Creating a crash . . .\n";
+
+    fundamentalValue *= (1.0-severity);
+
+    int removedLevels = 0;
+    std::uniform_real_distribution<double> removeChance(0.0, 1.0);
+
+    auto& asks = orderBook.getAsks();
+    auto& bids = orderBook.getBids();
+
+    auto purgeAsks = [&]() {
+        for (auto it = asks.begin(); it != asks.end();) {
+            if (removeChance(generator) < severity) {
+                it = asks.erase(it);
+                removedLevels++;
+            }
+            else {
+                ++it;
+            }
+        }
+    };
+
+    auto purgeBids = [&]() {
+        for (auto it = bids.begin(); it != bids.end(); ) {
+            if (removeChance(generator) < severity) {
+                it = bids.erase(it);
+                removedLevels++;
+            }else {
+                ++it;
+            }
+        }
+    };
+
+    purgeAsks();
+    purgeBids();
+
+    for (auto& [price, queue] : orderBook.getAsks()) {
+        for (auto& order: queue) {
+            order.price *= (1.0 + severity * 0.01 );
+        }
+    }
+
+    for (auto& [price, queue] : orderBook.getBids()) {
+        for (auto& order: queue) {
+            order.price *= (1.0 + severity * 0.01 );
+        }
+    }
+}

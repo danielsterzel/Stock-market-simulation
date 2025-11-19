@@ -62,13 +62,15 @@ int main() {
         //std::print("Num of aggressive agent: {}\n", numOfAggressiveAgents(agents));
         std::cout <<"Num of aggressive agent: " << numOfAggressiveAgents(agents) << std::endl;
         market.logState();
-        market.run(ITERATIONS_COUNT);
+        // market.run(ITERATIONS_COUNT);
 
         // for (int i = 0; i < ITERATIONS_COUNT; i++) {
         //     market.step();
         //     std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<long long>(10)));
         // }
-
+        market.run(500);
+        market.triggerCrash(0.3);
+        market.run(500);
         market.logState();
         //std::print("Number of agents in simulation {}\n", agents.size());
         std::cout << "Number of agents in simulation: " <<  agents.size()  <<std::endl;

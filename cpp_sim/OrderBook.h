@@ -32,6 +32,8 @@ public:
     [[nodiscard]] double spread() const;
     [[nodiscard]] double getDepth(int levels) const;
     void setOrderPurgeCallback(OrderPurgeCallback callBack);
+    [[nodiscard]]Bids& getBids();
+    [[nodiscard]]Asks& getAsks();
 private:
     // optional std::vector<Trade> that stores transaction history?
     OrderPurgeCallback logPurgedOrderFunction;

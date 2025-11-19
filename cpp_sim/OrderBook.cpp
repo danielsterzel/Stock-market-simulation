@@ -204,3 +204,11 @@ double OrderBook::getDepth(int levels) const {
 void OrderBook::setOrderPurgeCallback(OrderPurgeCallback callBack) {
     logPurgedOrderFunction = std::move(callBack);
 }
+
+OrderBook::Asks& OrderBook::getAsks() {
+    return asks;
+}
+OrderBook::Bids& OrderBook::getBids() {
+    return bids;
+}
+

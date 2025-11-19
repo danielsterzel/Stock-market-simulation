@@ -17,8 +17,9 @@ public:
     mutable Logger marketStatsLogger = {};
     mutable Logger agentActionLogger = {};
     void logLiveState() const;
-
+    void triggerCrash(double severity);
     const std::vector<Trade>& getTradeHistory() const;
+
 
 private:
     OrderBook orderBook;
