@@ -24,6 +24,10 @@ set(SOURCES
     Market.cpp
     Trade.h
     MarketStats.h
+        ScenarioConfig.cpp
+        ScenarioConfig.h
+        CommonFunctions.h
+        Error.h
 )
 
 add_executable(sm_sim ${SOURCES})

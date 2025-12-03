@@ -1,14 +1,12 @@
 #include <iostream>
-#include <print>
-#include <thread>
-
 #include "AggressiveAgent.h"
 #include "ConservativeAgent.h"
 #include "Market.h"
-#include "Order.h"
+// #include "Order.h"
 
-constexpr int ITERATIONS_COUNT = 10;
+constexpr int ITERATIONS_COUNT = 10000;
 
+[[deprecated("use CommonFunctions::countObjectType instead")]]
 int numOfAggressiveAgents(const std::vector<std::unique_ptr<Agent> > &agents) {
     int aggressiveAgentCount = 0;
     for (const auto &agent: agents) {
@@ -20,6 +18,7 @@ int numOfAggressiveAgents(const std::vector<std::unique_ptr<Agent> > &agents) {
 }
 
 int main() {
+
     try {
         Market market;
 
@@ -60,24 +59,27 @@ int main() {
         // prepopulateAgents(100);
         proportionalAgentPrePopulation(100, 0.3);
         //std::print("Num of aggressive agent: {}\n", numOfAggressiveAgents(agents));
-        std::cout <<"Num of aggressive agent: " << numOfAggressiveAgents(agents) << std::endl;
+        // std::cout <<"Num of aggressive agent: " << numOfAggressiveAgents(agents) << std::endl;
+
+        auto [aggressiveAgentsCount, agentsCount] = CommonFunctions::countObjectType(agents, AgentType::AGGRESSIVE);
+        std::cout <<"Num of aggressive agent: " << aggressiveAgentsCount << '\n';
+
         market.logState();
         // market.run(ITERATIONS_COUNT);
-
         // for (int i = 0; i < ITERATIONS_COUNT; i++) {
         //     market.step();
         //     std::this_thread::sleep_for(std::chrono::milliseconds(static_cast<long long>(10)));
         // }
+
         market.run(500);
-        market.triggerCrash(0.3);
+        market.triggerCrash(0.3); // triggering crash
         market.run(500);
         market.logState();
-        //std::print("Number of agents in simulation {}\n", agents.size());
-        std::cout << "Number of agents in simulation: " <<  agents.size()  <<std::endl;
-        //std::print("Simulation done");
-        std::cout << "Simulation done" << std::endl;
+
+        std::cout << "Number of agents in simulation: " <<  agentsCount << '\n';
+        std::cout << "===============\nSimulation done\n===============\n";
+
     } catch (const std::exception &e) {
-        //std::print("Error {}\n", e.what());
         std::cout << e.what() << std::endl;
     }
 }

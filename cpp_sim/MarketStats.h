@@ -4,5 +4,7 @@ struct MarketStats {
     double bestAsk;
     double midPrice;
     double spread;
-    double depth;
+    double currentDepthLevel;
+    //double currentPriceChange;
+    //double currentRelativeSpread;
 };

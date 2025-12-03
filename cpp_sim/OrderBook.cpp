@@ -211,4 +211,3 @@ OrderBook::Asks& OrderBook::getAsks() {
 OrderBook::Bids& OrderBook::getBids() {
     return bids;
 }
-

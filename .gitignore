@@ -2,4 +2,8 @@
 .idea/
 venv/
 logs/
+#czemu w git diff jest dalej plik csv który ignoruje?
+logs/market.csv
+logs/marketActions.txt
 cmake-build-*/
+diff.txt

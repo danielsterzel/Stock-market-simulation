@@ -26,14 +26,15 @@ void Market::step() {
     marketStats.bestBid  = fundamentalValue - 0.5;
     marketStats.bestAsk  = fundamentalValue + 0.5;
     marketStats.spread = marketStats.bestAsk - marketStats.bestBid;
-    marketStats.depth = 0.0;
+    marketStats.currentDepthLevel = 0.0;
+
 
     if (auto bestPrices = orderBook.bestPrices(); bestPrices) {
         marketStats.bestBid = bestPrices->first;
         marketStats.bestAsk = bestPrices->second;
         marketStats.midPrice = (marketStats.bestBid + marketStats.bestAsk) / 2.0;
         marketStats.spread = orderBook.spread();
-        marketStats.depth = orderBook.getDepth(5);
+        marketStats.currentDepthLevel = orderBook.getDepth(5);
     }
 
     for (const auto &agentPtr : agents) {
@@ -104,7 +105,7 @@ void Market::triggerCrash(double severity) {
     auto& asks = orderBook.getAsks();
     auto& bids = orderBook.getBids();
 
-    auto purgeAsks = [&]() {
+    auto purgeAsks = [&] {
         for (auto it = asks.begin(); it != asks.end();) {
             if (removeChance(generator) < severity) {
                 it = asks.erase(it);
@@ -116,7 +117,7 @@ void Market::triggerCrash(double severity) {
         }
     };
 
-    auto purgeBids = [&]() {
+    auto purgeBids = [&] {
         for (auto it = bids.begin(); it != bids.end(); ) {
             if (removeChance(generator) < severity) {
                 it = bids.erase(it);
