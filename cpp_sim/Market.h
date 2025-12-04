@@ -19,6 +19,7 @@ public:
     void logLiveState() const;
     void triggerCrash(double severity);
     const std::vector<Trade>& getTradeHistory() const;
+    ~Market();
 
 
 private:

@@ -85,7 +85,7 @@ public:
 
         auto [aggressiveCount, agentCount] = CommonFunctions::countObjectType<AgentType, Agents>(agentContainer, AgentType::AGGRESSIVE);
         configFile << "{\n"
-                   << " \"AggresiveCount\": " << aggressiveCount << ",\n"
+                   << " \"AggressiveCount\": " << aggressiveCount << ",\n"
                    << " \"AgentCount\": " << agentCount << "\n"
                    <<  "}\n";
     }

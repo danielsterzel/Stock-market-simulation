@@ -143,3 +143,14 @@ void Market::triggerCrash(double severity) {
         }
     }
 }
+Market::~Market() {
+    if (agents.empty()) {
+        std::cout << "Empty market no agents!";
+        return;
+    }
+    try {
+        Logger::saveScenarioConfig(agents, "../logs/ScenarioConfig.json");
+    } catch (...) {
+        std::cerr << "[WARN] Failed to save scenario config in destructor\n";
+    }
+}
