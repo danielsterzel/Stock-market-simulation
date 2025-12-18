@@ -10,6 +10,7 @@ EXECUTABLE_DIR = '../cpp_sim/cmake-build-debug'
 EXECUTABLE_NAME = 'sm_sim.exe' # lub 'sm_sim' na Linuksie
 EXECUTABLE_PATH = os.path.join(EXECUTABLE_DIR, EXECUTABLE_NAME)
 
+
 # Sprawdzenie, czy plik istnieje
 if not os.path.exists(EXECUTABLE_PATH):
     print(f"Error: Executable not found at '{EXECUTABLE_PATH}'")
