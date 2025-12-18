@@ -7,4 +7,7 @@ struct MarketStats {
     double currentDepthLevel;
     //double currentPriceChange;
     //double currentRelativeSpread;
+    double fundamentalValue;
+    double volatility;
+    double slippage;
 };

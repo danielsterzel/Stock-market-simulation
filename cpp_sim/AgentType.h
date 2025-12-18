@@ -4,6 +4,7 @@
 enum class AgentType {
     AGGRESSIVE,
     CONSERVATIVE,
+    MOMENTUM,
     RANDOM
 };
 
