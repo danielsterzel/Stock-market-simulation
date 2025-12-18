@@ -1,0 +1,3 @@
+C:/Users/mkrol/PycharmProjects/Stock-market-simulation/cpp_sim/build/CMakeFiles/sm_sim.dir
+C:/Users/mkrol/PycharmProjects/Stock-market-simulation/cpp_sim/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/mkrol/PycharmProjects/Stock-market-simulation/cpp_sim/build/CMakeFiles/ZERO_CHECK.dir

@@ -1,0 +1,87 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="C:\Users\mkrol\PycharmProjects\Stock-market-simulation\cpp_sim\main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mkrol\PycharmProjects\Stock-market-simulation\cpp_sim\OrderBook.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mkrol\PycharmProjects\Stock-market-simulation\cpp_sim\AggressiveAgent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mkrol\PycharmProjects\Stock-market-simulation\cpp_sim\ConservativeAgent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mkrol\PycharmProjects\Stock-market-simulation\cpp_sim\Market.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mkrol\PycharmProjects\Stock-market-simulation\cpp_sim\ScenarioConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\Users\mkrol\PycharmProjects\Stock-market-simulation\cpp_sim\MomentumAgent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C:\Users\mkrol\PycharmProjects\Stock-market-simulation\cpp_sim\Order.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mkrol\PycharmProjects\Stock-market-simulation\cpp_sim\OrderBook.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mkrol\PycharmProjects\Stock-market-simulation\cpp_sim\Agent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mkrol\PycharmProjects\Stock-market-simulation\cpp_sim\AggressiveAgent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mkrol\PycharmProjects\Stock-market-simulation\cpp_sim\OrderType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mkrol\PycharmProjects\Stock-market-simulation\cpp_sim\ConservativeAgent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mkrol\PycharmProjects\Stock-market-simulation\cpp_sim\Logger.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mkrol\PycharmProjects\Stock-market-simulation\cpp_sim\AgentType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mkrol\PycharmProjects\Stock-market-simulation\cpp_sim\Market.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mkrol\PycharmProjects\Stock-market-simulation\cpp_sim\Trade.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mkrol\PycharmProjects\Stock-market-simulation\cpp_sim\MarketStats.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mkrol\PycharmProjects\Stock-market-simulation\cpp_sim\ScenarioConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mkrol\PycharmProjects\Stock-market-simulation\cpp_sim\CommonFunctions.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mkrol\PycharmProjects\Stock-market-simulation\cpp_sim\Error.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mkrol\PycharmProjects\Stock-market-simulation\cpp_sim\DataLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\Users\mkrol\PycharmProjects\Stock-market-simulation\cpp_sim\MomentumAgent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\mkrol\PycharmProjects\Stock-market-simulation\cpp_sim\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{5EA1AC38-0262-3F55-BB07-A7AC07331AA4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{3E835A94-AAC5-383C-99C5-44F408573FB0}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
