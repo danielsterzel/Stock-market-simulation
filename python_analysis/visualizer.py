@@ -4,11 +4,13 @@ import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 from collections import deque
 
+
 # --- KONFIGURACJA ---
 # Zmień tę ścieżkę na dokładną lokalizację Twojego skompilowanego pliku .exe
 EXECUTABLE_DIR = '../cpp_sim/cmake-build-debug'
 EXECUTABLE_NAME = 'sm_sim.exe' # lub 'sm_sim' na Linuksie
 EXECUTABLE_PATH = os.path.join(EXECUTABLE_DIR, EXECUTABLE_NAME)
+
 
 # Sprawdzenie, czy plik istnieje
 if not os.path.exists(EXECUTABLE_PATH):

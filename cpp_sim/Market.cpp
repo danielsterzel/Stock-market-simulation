@@ -2,79 +2,140 @@
 // Created by Daniel Sterzel on 27/10/2025.
 //
 #include "Market.h"
-
+#include "DataLoader.h"
+#include <numeric>
+#include <cmath>
 #include <iostream>
-// #include <print>
 
 Market::Market() {
     now = std::chrono::steady_clock::now();
     orderBook.setOrderPurgeCallback([this](const Order& o) {
-        agentActionLogger.writeAction("PURGED", o);
+    agentActionLogger.writeAction("PURGED", o);
     });
-    initialPrice = 100.0;
+    currentStats = {0,0,0,0,0,0,0,0};
+}
+
+void Market::loadRealData(const std::string& csvPath) {
+    realPricePath = DataLoader::loadPriceHistory(csvPath);
+    if (!realPricePath.empty()) {
+        fundamentalValue = realPricePath[0];
+        initialPrice = fundamentalValue;
+        // Reset indeksu przy nowym ładowaniu
+        currentDataIndex = 0;
+    }
+}
+
+double Market::calculateVolatility() {
+    constexpr size_t windowSize = 50;
+    priceHistoryWindow.push_back(currentStats.midPrice);
+    if (priceHistoryWindow.size() > windowSize) {
+        priceHistoryWindow.pop_front();
+    }
+
+    if (priceHistoryWindow.size() < 2) return 0.0;
+
+    double sum = std::accumulate(priceHistoryWindow.begin(), priceHistoryWindow.end(), 0.0);
+    double mean = sum / priceHistoryWindow.size();
+
+    double sq_sum = std::inner_product(priceHistoryWindow.begin(), priceHistoryWindow.end(), priceHistoryWindow.begin(), 0.0);
+    double stdev = std::sqrt(sq_sum / priceHistoryWindow.size() - mean * mean);
+
+    return stdev;
+}
+
+double Market::calculateSlippage(const std::vector<Trade>& trades, double benchmarkPrice) {
+    if (trades.empty()) return 0.0;
+    double totalSlippageVolume = 0.0;
+    double totalVolume = 0.0;
+
+    for (const auto& trade : trades) {
+
+        double diff = std::abs(trade.price - benchmarkPrice);
+        totalSlippageVolume += diff * trade.quantity;
+        totalVolume += trade.quantity;
+    }
+    return (totalVolume > 0) ? (totalSlippageVolume / totalVolume) : 0.0;
 }
 
 void Market::step() {
-    static MarketStats lastStats { 99.5, 100.5, 100.0, 1.0, 0.0 };
-    MarketStats marketStats = lastStats;
-
-    static std::default_random_engine rng(std::random_device{}());
-    static std::normal_distribution<double> drift(0.0, 0.05);
-    fundamentalValue += drift(rng);
-
-    marketStats.midPrice = fundamentalValue;
-    marketStats.bestBid  = fundamentalValue - 0.5;
-    marketStats.bestAsk  = fundamentalValue + 0.5;
-    marketStats.spread = marketStats.bestAsk - marketStats.bestBid;
-    marketStats.currentDepthLevel = 0.0;
-
+    if (!realPricePath.empty()) {
+        if (currentDataIndex < realPricePath.size()) {
+            fundamentalValue = realPricePath[currentDataIndex++];
+        } else {
+            fundamentalValue = realPricePath.back();
+        }
+    } else {
+        static std::normal_distribution<double> drift(0.0, 0.05);
+        fundamentalValue += drift(generator);
+    }
+    currentStats.fundamentalValue = fundamentalValue;
 
     if (auto bestPrices = orderBook.bestPrices(); bestPrices) {
-        marketStats.bestBid = bestPrices->first;
-        marketStats.bestAsk = bestPrices->second;
-        marketStats.midPrice = (marketStats.bestBid + marketStats.bestAsk) / 2.0;
-        marketStats.spread = orderBook.spread();
-        marketStats.currentDepthLevel = orderBook.getDepth(5);
+        currentStats.bestBid = bestPrices->first;
+        currentStats.bestAsk = bestPrices->second;
+        currentStats.midPrice = (currentStats.bestBid + currentStats.bestAsk) / 2.0;
+        currentStats.spread = orderBook.spread();
+        currentStats.currentDepthLevel = orderBook.getDepth(5);
+    } else {
+        currentStats.midPrice = fundamentalValue;
+        currentStats.bestBid = fundamentalValue - 0.5;
+        currentStats.bestAsk = fundamentalValue + 0.5;
+        currentStats.spread = 1.0;
+        currentStats.currentDepthLevel = 0.0;
     }
 
+    currentStats.volatility = calculateVolatility();
+
+    double preStepPrice = currentStats.midPrice;
+    std::vector<Trade> stepTrades;
+
     for (const auto &agentPtr : agents) {
-        Order order = agentPtr->generateAction(marketStats, now);
-        // Logowanie akcji agenta
+        Order order = agentPtr->generateAction(currentStats, now);
         agentActionLogger.writeAction(agentPtr->getType(), order);
 
         if (order.quantity > 0) {
             std::vector<Trade> newTrades = orderBook.processOrder(order, now);
             if (!newTrades.empty()) {
                 tradeHistory.insert(tradeHistory.end(), newTrades.begin(), newTrades.end());
+                stepTrades.insert(stepTrades.end(), newTrades.begin(), newTrades.end());
             }
         }
     }
 
     orderBook.purgeExpired(now);
+    currentStats.slippage = calculateSlippage(stepTrades, preStepPrice);
 
-    lastStats = marketStats;
     now += std::chrono::milliseconds(static_cast<long long>(1));
-
-    //logLiveState();
 }
 
-void Market::run(const size_t steps) {
-    marketStatsLogger.openFile("../logs/market.csv", true);
-    marketStatsLogger.writeCsvHeaders({"Time","BestBid","BestAsk","Spread", "Depth"});
+void Market::run(const size_t steps, const std::string& logFileName) {
+    marketStatsLogger.openFile(logFileName, true);
+    marketStatsLogger.writeCsvHeaders({"Time","BestBid","BestAsk","Spread", "Depth", "Fundamental", "Volatility", "Slippage"});
     agentActionLogger.openFile("../logs/marketActions.txt", true);
-    for (size_t i = 0; i < steps; ++i) {
+
+    size_t runSteps = steps;
+
+    if (!realPricePath.empty() && realPricePath.size() < steps) {
+        std::cout << "[INFO] Adjusting simulation steps to data size: " << realPricePath.size() << "\n";
+        runSteps = realPricePath.size();
+    }
+
+    for (size_t i = 0; i < runSteps; ++i) {
         step();
         logState();
     }
 }
 
-void Market::logState() const{
-    if (auto bestPrices = orderBook.bestPrices(); bestPrices) {
-        const auto [bestBid, bestAsk] = *bestPrices;
-        const double spread = orderBook.spread();
-        const double depth = orderBook.getDepth(5);
-        marketStatsLogger.logToCsvFormat(bestBid, bestAsk, spread, depth);
-    }
+void Market::logState() const {
+    marketStatsLogger.logToCsvFormat(
+    currentStats.bestBid,
+    currentStats.bestAsk,
+    currentStats.spread,
+    currentStats.currentDepthLevel,
+    currentStats.fundamentalValue,
+    currentStats.volatility,
+    currentStats.slippage
+    );
 }
 
 void Market::logLiveState() const {
