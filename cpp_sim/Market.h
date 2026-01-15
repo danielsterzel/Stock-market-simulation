@@ -14,7 +14,7 @@ public:
     void loadRealData(const std::string& csvPath);
 
     void step();
-    void run(size_t steps, const std::string& logFileName);
+    void run(size_t steps, const std::string& logFileName, double crashSeverity = 0.0);
     void logState() const;
     AgentContainer& getAgentContainer();
 
@@ -49,4 +49,10 @@ private:
 
     MarketStats currentStats;
     std::deque<double> priceHistoryWindow;
+
+    struct PendingOrder {
+        std::chrono::steady_clock::time_point executionTime;
+        Order order;
+    };
+    std::vector<PendingOrder> latencyQueue;
 };

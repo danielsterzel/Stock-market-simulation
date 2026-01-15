@@ -35,7 +35,6 @@ set(SOURCES
 add_executable(sm_sim ${SOURCES})
 
 if (MSVC)
-    # Usunięto /WX, aby ostrzeżenia nie blokowały kompilacji
     target_compile_options(sm_sim PRIVATE /W4)
 else ()
     target_compile_options(sm_sim PRIVATE -Wall -Wextra -Wpedantic)

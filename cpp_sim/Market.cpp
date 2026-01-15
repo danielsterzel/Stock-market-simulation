@@ -83,24 +83,48 @@ void Market::step() {
         currentStats.spread = 1.0;
         currentStats.currentDepthLevel = 0.0;
     }
-
     currentStats.volatility = calculateVolatility();
-
     double preStepPrice = currentStats.midPrice;
-    std::vector<Trade> stepTrades;
 
     for (const auto &agentPtr : agents) {
         Order order = agentPtr->generateAction(currentStats, now);
-        agentActionLogger.writeAction(agentPtr->getType(), order);
 
-        if (order.quantity > 0) {
-            std::vector<Trade> newTrades = orderBook.processOrder(order, now);
+        if (order.orderType != OrderType::CANCELORDER) {
+             long long delayMs = 0;
+
+            if (agentPtr->getType() == AgentType::AGGRESSIVE) {
+                delayMs = 1;
+            } else if (agentPtr->getType() == AgentType::MOMENTUM) {
+                delayMs = 20;
+            } else {
+                delayMs = 100;
+            }
+
+            auto executionTime = now + std::chrono::milliseconds(delayMs);
+            latencyQueue.push_back({executionTime, order});
+
+            agentActionLogger.writeAction(agentPtr->getType(), order);
+        }
+    }
+
+    std::vector<Trade> stepTrades;
+
+    auto it = latencyQueue.begin();
+    while (it != latencyQueue.end()) {
+        if (now >= it->executionTime) {
+            std::vector<Trade> newTrades = orderBook.processOrder(it->order, now);
+
             if (!newTrades.empty()) {
                 tradeHistory.insert(tradeHistory.end(), newTrades.begin(), newTrades.end());
                 stepTrades.insert(stepTrades.end(), newTrades.begin(), newTrades.end());
             }
+            it = latencyQueue.erase(it);
+        } else {
+            ++it;
         }
     }
+
+    // ----------------------------------------
 
     orderBook.purgeExpired(now);
     currentStats.slippage = calculateSlippage(stepTrades, preStepPrice);
@@ -108,7 +132,7 @@ void Market::step() {
     now += std::chrono::milliseconds(static_cast<long long>(1));
 }
 
-void Market::run(const size_t steps, const std::string& logFileName) {
+void Market::run(const size_t steps, const std::string& logFileName, double crashSeverity) {
     marketStatsLogger.openFile(logFileName, true);
     marketStatsLogger.writeCsvHeaders({"Time","BestBid","BestAsk","Spread", "Depth", "Fundamental", "Volatility", "Slippage"});
     agentActionLogger.openFile("../logs/marketActions.txt", true);
@@ -121,6 +145,11 @@ void Market::run(const size_t steps, const std::string& logFileName) {
     }
 
     for (size_t i = 0; i < runSteps; ++i) {
+        if (crashSeverity > 0.0 && i == runSteps / 2) {
+            std::cout << "[SIMULATION] TRIGGERING FLASH CRASH AT STEP " << i << "\n";
+            triggerCrash(crashSeverity);
+        }
+
         step();
         logState();
     }

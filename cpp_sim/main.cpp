@@ -1,4 +1,4 @@
-    #include <iostream>
+#include <iostream>
 #include <string>
 #include <vector>
 #include <memory>
@@ -16,6 +16,7 @@ int main(int argc, char* argv[]) {
     float aggressiveRatio = 0.2f;
     float momentumRatio = 0.2f;
     std::string logFileName = "../../output/market.csv";
+    double crashSeverity = 0.0;
 
     if (argc >= 7) {
         try {
@@ -28,6 +29,9 @@ int main(int argc, char* argv[]) {
 
             if (argc >= 8) {
                 logFileName = "../../output" + std::string(argv[7]);
+            }
+            if (argc >= 9) {
+                crashSeverity = std::stof(argv[8]);
             }
         } catch (const std::exception& e) {
             std::cerr << "Błąd parsowania argumentów: " << e.what() << "\n";
@@ -60,7 +64,7 @@ int main(int argc, char* argv[]) {
         std::cout << "Log File: " << logFileName << "\n";
         std::cout << "---------------------\n";
 
-        market.run(steps, logFileName);
+        market.run(steps, logFileName, crashSeverity);
 
 
     } catch (const std::exception &e) {
