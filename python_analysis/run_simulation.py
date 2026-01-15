@@ -19,30 +19,30 @@ EXE_DIR = os.path.dirname(EXE_PATH)
 OUTPUT_DIR = os.path.join(PROJECT_ROOT, "output")
 DATA_DIR = os.path.join(PROJECT_ROOT, "data")
 
-STEPS = 1000
+STEPS = 2000
 AGENTS_COUNT = 500
 MAX_WORKERS = os.cpu_count()
 
 # --- 2. SCENARIUSZE ---
 SCENARIOS = [
     # EXP 1: WPŁYW SPEKULANTÓW
-    ("EXP1", "1A_Conservative_Dominated", 0.90, 0.05, 0.05, 0.0, "input_stable.csv"),
-    ("EXP1", "1B_Balanced_Market", 0.50, 0.40, 0.10, 0.0, "input_stable.csv"),
-    ("EXP1", "1C_Aggressive_Dominated", 0.10, 0.80, 0.10, 0.0, "input_stable.csv"),
+    # ("EXP1", "1A_Conservative_Dominated", 0.90, 0.05, 0.05, 0.0, "input_stable.csv"),
+    # ("EXP1", "1B_Balanced_Market", 0.50, 0.40, 0.10, 0.0, "input_stable.csv"),
+    # ("EXP1", "1C_Aggressive_Dominated", 0.10, 0.80, 0.10, 0.0, "input_stable.csv"),
 
     # EXP 2: TEST ODPORNOŚCI NA KRACH
-    ("EXP2", "2A_Resilient_StrongMaker", 0.70, 0.15, 0.15, 0.4, "input_crisis.csv"),
-    ("EXP2", "2B_Average_Fragility", 0.40, 0.40, 0.20, 0.4, "input_crisis.csv"),
-    ("EXP2", "2C_Critical_Fragility", 0.10, 0.70, 0.20, 0.4, "input_crisis.csv"),
+    # ("EXP2", "2A_Resilient_StrongMaker", 0.70, 0.15, 0.15, 0.4, "input_crisis.csv"),
+    # ("EXP2", "2B_Average_Fragility", 0.40, 0.40, 0.20, 0.4, "input_crisis.csv"),
+    # ("EXP2", "2C_Critical_Fragility", 0.10, 0.70, 0.20, 0.4, "input_crisis.csv"),
 
     # EXP 3: EFEKT MOMENTUM
-    ("EXP3", "3A_No_Momentum", 0.60, 0.40, 0.00, 0.0, "input_bubble.csv"),
-    ("EXP3", "3B_Moderate_Momentum", 0.40, 0.30, 0.30, 0.0, "input_bubble.csv"),
-    ("EXP3", "3C_High_Momentum_Frenzy", 0.20, 0.10, 0.70, 0.0, "input_bubble.csv"),
+    # ("EXP3", "3A_No_Momentum", 0.60, 0.40, 0.00, 0.0, "input_bubble.csv"),
+    # ("EXP3", "3B_Moderate_Momentum", 0.40, 0.30, 0.30, 0.0, "input_bubble.csv"),
+    # ("EXP3", "3C_High_Momentum_Frenzy", 0.20, 0.10, 0.70, 0.0, "input_bubble.csv"),
 
     # EXP 4: GRANICA PŁYNNOŚCI
-    ("EXP4", "4A_Low_Liquidity", 0.10, 0.80, 0.10, 0.0, "input_growth.csv"),
-    ("EXP4", "4B_Liquidity_Death_Zone", 0.02, 0.88, 0.10, 0.0, "input_growth.csv"),
+    # ("EXP4", "4A_Low_Liquidity", 0.10, 0.80, 0.10, 0.0, "input_growth.csv"),
+    # ("EXP4", "4B_Liquidity_Death_Zone", 0.02, 0.88, 0.10, 0.0, "input_growth.csv"),
 
     # EXP 5: WALIDACJA
     ("EXP5", "5A_Standard_Tracking", 0.50, 0.30, 0.20, 0.0, "input_sine.csv"),
